@@ -1,0 +1,30 @@
+{
+  "name": "kaiju",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kaiju: a local, Jira Cloud-compatible mock (REST v3/v2 subset, Jira-style automation, Jira-like UI) for POCs, demos and integration tests.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "bash test/smoke.sh"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  },
+  "license": "MIT",
+  "keywords": [
+    "jira",
+    "mock",
+    "jira-cloud",
+    "rest-api",
+    "automation",
+    "testing",
+    "integration-testing",
+    "poc"
+  ]
+}

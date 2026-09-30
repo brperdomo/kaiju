@@ -1,0 +1,80 @@
+{
+  "site": { "name": "Kaiju" },
+  "users": [
+    { "displayName": "Integration Service", "emailAddress": "svc@mock.local", "apiToken": "env:KAIJU_TOKEN" },
+    { "displayName": "Sam Rivera", "emailAddress": "sam@example.com" },
+    { "displayName": "Priya Shah", "emailAddress": "priya@example.com" },
+    { "displayName": "Chris Park", "emailAddress": "chris@example.com", "emailVisible": false }
+  ],
+  "fields": [
+    { "id": "customfield_10016", "name": "Story Points", "type": "number" },
+    { "id": "customfield_10020", "name": "Environment", "type": "select", "options": ["Dev", "Staging", "Production"] },
+    { "id": "customfield_10030", "name": "External Link", "type": "url" }
+  ],
+  "workflows": {
+    "software": {
+      "statuses": [
+        { "name": "To Do", "category": "new" },
+        { "name": "In Progress", "category": "indeterminate" },
+        { "name": "In Review", "category": "indeterminate" },
+        { "name": "Done", "category": "done" }
+      ],
+      "transitions": [
+        { "id": "11", "name": "To Do", "to": "To Do" },
+        { "id": "21", "name": "In Progress", "to": "In Progress" },
+        { "id": "31", "name": "In Review", "to": "In Review" },
+        { "id": "41", "name": "Done", "to": "Done" }
+      ]
+    }
+  },
+  "projects": [
+    {
+      "key": "DEMO", "name": "Demo Project", "lead": "sam@example.com",
+      "issueTypes": [
+        { "name": "Epic", "epic": true, "workflow": "software" },
+        { "name": "Story", "workflow": "software" },
+        { "name": "Task", "workflow": "software" },
+        { "name": "Bug", "workflow": "software" },
+        { "name": "Subtask", "subtask": true, "workflow": "software" }
+      ]
+    }
+  ],
+  "variables": { "WEBHOOK_URL": "env:WEBHOOK_URL|http://localhost:8790/_mock/echo" },
+  "secrets": { "WEBHOOK_TOKEN": "env:WEBHOOK_TOKEN|demo-secret" },
+  "automation": [
+    {
+      "id": "close-parent", "name": "When all subtasks are done, move the parent to Done",
+      "trigger": { "type": "issue_transitioned", "to": "Done", "issueTypes": ["Subtask"] },
+      "actions": [
+        { "type": "branch", "on": "parent",
+          "conditions": [{ "type": "subtasks", "match": "all", "status": ["Done"] }, { "type": "status", "in": ["To Do", "In Progress", "In Review"] }],
+          "actions": [{ "type": "transition_issue", "to": "Done", "comment": "All subtasks are done." }] }
+      ]
+    },
+    {
+      "id": "notify", "name": "Send work item to a webhook",
+      "trigger": { "type": "manual", "issueTypes": ["Story", "Task", "Bug"] },
+      "actions": [
+        { "type": "send_web_request", "url": "{{var.WEBHOOK_URL}}", "method": "POST",
+          "headers": { "X-Token": "{{secret.WEBHOOK_TOKEN}}" },
+          "body": { "key": "{{issue.key}}", "summary": "{{issue.summary}}", "status": "{{issue.status}}", "points": "{{issue.Story Points}}", "pointsInt": "{{issue.Story Points.format(\"0\")}}" } },
+        { "type": "comment", "body": "Sent to webhook: HTTP {{webResponse.status}}" }
+      ]
+    },
+    {
+      "id": "inbound", "name": "Incoming webhook: comment on the work items it names",
+      "trigger": { "type": "incoming_webhook", "token": "demo-webhook-token" },
+      "actions": [{ "type": "comment", "body": "Webhook said: {{webhookData.message}}" }]
+    }
+  ],
+  "seed": {
+    "issues": [
+      { "ref": "epic", "issueType": "Epic", "summary": "Onboarding revamp", "reporter": "sam@example.com", "status": "In Progress" },
+      { "ref": "s1", "issueType": "Story", "summary": "New sign-up form", "parent": "epic", "assignee": "priya@example.com", "reporter": "sam@example.com", "status": "In Progress", "fields": { "Story Points": 5, "Environment": "Staging" }, "description": "Replace the legacy sign-up form.\n\nAcceptance: works on mobile." },
+      { "issueType": "Subtask", "summary": "Design review", "parent": "s1", "assignee": "chris@example.com", "status": "Done" },
+      { "issueType": "Subtask", "summary": "Accessibility pass", "parent": "s1", "assignee": "priya@example.com" },
+      { "issueType": "Bug", "summary": "Password reset email not sent", "assignee": "sam@example.com", "reporter": "chris@example.com", "fields": { "Environment": "Production" } },
+      { "issueType": "Task", "summary": "Update onboarding docs", "reporter": "sam@example.com", "status": "In Review" }
+    ]
+  }
+}
