@@ -173,7 +173,7 @@ export class Automation {
       issue: ctx.issue, triggerIssue: ctx.triggerIssue, webResponse: ctx.webResponse, webhookData: ctx.trigger?.webhookData,
       var: this.store.ws.variables, secret: secretProxy, now: { __str: jiraNow(), iso: new Date().toISOString() },
       rule: { name: ctx.rule.name, id: ctx.rule.id, __str: ctx.rule.name }, initiator: this.userSnap(ctx.trigger?.actor?.accountId),
-      fromStatus: ctx.trigger?.from, toStatus: ctx.trigger?.to,
+      fromStatus: ctx.trigger?.from, toStatus: ctx.trigger?.to, baseUrl: this.store.baseUrl,
     }];
   }
 
