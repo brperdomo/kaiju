@@ -2,7 +2,7 @@
 //
 //   {{issue.key}}  {{issue.summary}}  {{issue.status}}  {{issue.Field Name}}  {{issue.customfield_10001}}
 //   {{issue.parent.key}}  {{issue.assignee.emailAddress}}  {{issue.attachments.last.content}}
-//   {{webResponse.status}}  {{webResponse.body.some.path}}  {{var.NAME}}  {{secret.NAME}}  {{now}}
+//   {{webResponse.status}}  {{webResponse.body.some.path}}  {{var.NAME}}  {{secret.NAME}}  {{now}}  {{baseUrl}}
 //   Methods: .plus(n) .minus(n) .multiply(n) .divide(n) .format("0") .asNumber .jsonEncode .asJsonString
 //            .urlEncode .toLowerCase .toUpperCase .trim .size .first .last .isEmpty .isNotEmpty
 //            .substring(a,b) .replace("a","b")
